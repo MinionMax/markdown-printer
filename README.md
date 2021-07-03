@@ -22,3 +22,7 @@ yarn start
 ```
 the bot will now be going online, and print "🚀 Ready to print..." on the command line.<br>
 to give it something to print use the "!MD" flag, followed by your markdown text...<br>
+
+## example
+correct use of the mardown printer, using my project-initiator README:
+![example](https://cdn.discordapp.com/attachments/860541885621993492/860908282410434560/Screen_Shot_2021-07-03_at_17.41.47.png)
