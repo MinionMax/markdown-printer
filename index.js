@@ -1,29 +1,32 @@
 const dotenv = require("dotenv").config();
 const puppeteer = require("puppeteer");
 const fs = require("fs");
-const express = require("express");
-const app = express();
+const path = require("path");
 const { Remarkable } = require("remarkable");
 const md = new Remarkable();
 const Discord = require("discord.js");
 const client = new Discord.Client();
-const PORT = process.env.PORT || 3000;
+
 
 client.on("ready", () => {
-    console.log("Ready to print 🖨 \ncheck toner levels pls...");
+    console.log("🚀 Ready to print...");
 })
 
 client.on("message", async (message) => {
 
     if (!message.content.startsWith("!MD")) return;
     if (message.content.startsWith("!MD")){
+        console.log("✨ New print request")
         exportMD(message);
     }
 })
 
 async function exportMD(message){
 
+    console.log("[1/5] ⚙️  Processesing Markdown...");
+    message.react("⚙️");
     const input = message.content.split("!MD ")[1];
+    console.log(input);
     const render = md.render(input);
     const output = `
     <!DOCTYPE html>
@@ -44,32 +47,37 @@ async function exportMD(message){
     `;
 
     fs.writeFile("public/index.html", output, (err) => { if (err) throw err });
-    snapMD();
+    snapMD(message);
 }
 
-async function snapMD(){
-    const browser = await puppeteer.launch({headless: true});
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function snapMD(message){
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-    await page.goto(`localhost:${PORT}/`);
+    await page.goto(`file:${path.join(__dirname + "/public/index.html")}`);
+    await sleep(1000);
     await page.waitForSelector("#output");
     const output = await page.$("#output");
-    const res = await output.screenshot({path: "assets/md.png"});
-    print();
-    await browser.close();
+    await output.screenshot({path: "assets/md.png"});
+    console.log("[2/5] ✅ Markdown processed...");
+    message.react("✅")
+    print(message);
 }
 
-function print(){
+async function print(message){
+    console.log("[3/5] 🖨  Printing...")
+    await message.channel.send({files: ["assets/md.png"]});
+    cleanup();
+}
 
+function cleanup(){
+    console.log("[4/5] 🧹 Cleaning up...")
+    fs.unlinkSync("assets/md.png");
+    console.log("[5/5] 🎉 Done!");
+    console.log("🚀 Ready to print...");
 }
 
 client.login(process.env.TOKEN);
-
-app.use(express.static(__dirname + "/public"));
-
-app.get("/", (req, res) => {
-    res.sendFile(__dirname + "public", "index.html");
-})
-
-app.listen(PORT, () => {
-    console.log(`Listening on port ${PORT}...`);
-})
