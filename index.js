@@ -25,7 +25,7 @@ async function exportMD(message){
 
     console.log("[1/5] ⚙️  Processesing Markdown...");
     message.react("⚙️");
-    const input = message.content.split("!MD ")[1];
+    const input = message.content.split("!MD")[1];
     console.log(input);
     const render = md.render(input);
     const output = `

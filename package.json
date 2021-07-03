@@ -6,7 +6,8 @@
   "author": "MinionMax <maxime.mion@gmx.de>",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "node index.js",
+    "test": "nodemon index.js"
   },
   "dependencies": {
     "discord.js": "^12.5.3",
